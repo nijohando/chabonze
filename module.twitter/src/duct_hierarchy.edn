@@ -1,0 +1,5 @@
+{:jp.nijohando.chabonze.module/twitter [:duct/module]
+ :jp.nijohando.chabonze.twitter/command [:jp.nijohando.chabonze/command]
+ :jp.nijohando.chabonze.twitter/auth [:jp.nijohando.chabonze/twitter :jp.nijohando.chabonze/subcommand]
+ :jp.nijohando.chabonze.twitter/list [:jp.nijohando.chabonze/twitter :jp.nijohando.chabonze/subcommand]
+ :jp.nijohando.chabonze.twitter/watch [:jp.nijohando.chabonze/twitter :jp.nijohando.chabonze/subcommand]}

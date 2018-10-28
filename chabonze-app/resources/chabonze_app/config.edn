@@ -1,0 +1,11 @@
+{:duct.profile/base
+ {:duct.core/project-ns chabonze-app}
+
+ :duct.profile/dev   #duct/include "dev"
+ :duct.profile/local #duct/include "local"
+ :duct.profile/prod {
+  :duct.logger/timbre {:level :info}}
+ :duct.module/logging {}
+ :jp.nijohando.chabonze.module/bot {}
+ ;:jp.nijohando.chabonze.module/twitter {}
+ }
