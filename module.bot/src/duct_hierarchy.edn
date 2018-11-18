@@ -1,0 +1,2 @@
+{:jp.nijohando.chabonze.module/bot [:duct/module]
+ :jp.nijohando.chabonze.bot/listener [:duct/daemon]}
