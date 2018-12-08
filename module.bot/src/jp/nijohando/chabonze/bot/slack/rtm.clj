@@ -52,6 +52,8 @@
            emitter-buffer-size
            listener-buffer-size
            max-connect-retries
+           connect-retry-backoff-initial-delay
+           connect-retry-backoff-max-delay
            connect-timeout
            socket-timeout
            connect-event-timeout
@@ -62,6 +64,8 @@
          emitter-buffer-size 32
          listener-buffer-size 32
          max-connect-retries 5
+         connect-retry-backoff-initial-delay 1000
+         connect-retry-backoff-max-delay 60000
          connect-event-timeout 3000
          disconnect-event-timeout 3000} :as opts}]
   (let [ws-emitter (ca/chan emitter-buffer-size)
@@ -172,7 +176,8 @@
                       (dl/log logger :warn :disconnect-event-timeout x))))))
             (connect! []
               (dh/with-retry {:retry-if (fn [val ex] (or (f/fail? val) (some? ex)))
-                              :max-retries max-connect-retries}
+                              :max-retries max-connect-retries
+                              :backoff-ms [connect-retry-backoff-initial-delay connect-retry-backoff-max-delay]}
                 (d/do*
                   (let [listener (ca/chan 1)
                         _ (d/defer (ca/close! listener))

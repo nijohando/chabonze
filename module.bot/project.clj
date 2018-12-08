@@ -1,4 +1,4 @@
-(defproject jp.nijohando.chabonze/module.bot "0.1.0"
+(defproject jp.nijohando.chabonze/module.bot "0.1.1"
   :description "Duct module for chabonze core"
   :url "https://github.com/nijohando/chabonze"
   :dependencies [[org.clojure/clojure "1.9.0"]
@@ -11,9 +11,9 @@
                  [cheshire "5.8.0"]
                  [jp.nijohando/failable "0.4.1"]
                  [jp.nijohando/deferable "0.2.1"]
-                 [jp.nijohando/event "0.1.4"]
-                 [jp.nijohando/event.websocket "0.1.0"]
-                 [jp.nijohando/event.timer "0.1.0"]
+                 [jp.nijohando/event "0.1.5"]
+                 [jp.nijohando/event.websocket "0.1.1"]
+                 [jp.nijohando/event.timer "0.1.1"]
                  [jp.nijohando/fs "0.1.0"]
                  [jp.nijohando/ext.async "0.1.0"]]
   :plugins [[lein-eftest "0.5.3"]]
