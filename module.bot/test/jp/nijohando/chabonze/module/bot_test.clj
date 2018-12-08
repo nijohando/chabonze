@@ -22,7 +22,9 @@
      :bus-buffer-size 32
      :emitter-buffer-size 16
      :listener-buffer-size 16
-     :max-connect-retries 10
+     :max-connect-retries 20
+     :connect-retry-backoff-initial-delay 2000
+     :connect-retry-backoff-max-delay 10000
      :connect-timeout 3000
      :socket-timeout 2000
      :connect-event-timeout 4000
@@ -46,7 +48,9 @@
            :bus-buffer-size 64
            :emitter-buffer-size 32
            :listener-buffer-size 32
-           :max-connect-retries 5
+           :max-connect-retries 10
+           :connect-retry-backoff-initial-delay 1000
+           :connect-retry-backoff-max-delay 60000
            :socket-timeout 1000
            :connect-timeout 1000
            :connect-event-timeout 5000
@@ -77,7 +81,9 @@
            :bus-buffer-size 32
            :emitter-buffer-size 16
            :listener-buffer-size 16
-           :max-connect-retries 10
+           :max-connect-retries 20
+           :connect-retry-backoff-initial-delay 2000
+           :connect-retry-backoff-max-delay 10000
            :connect-timeout 3000
            :socket-timeout 2000
            :connect-event-timeout 4000
