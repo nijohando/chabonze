@@ -32,10 +32,18 @@
              :connect-timeout (merge/displace 1000)
              :oauth-consumer-key (merge/displace @oauth-consumer-key)
              :oauth-consumer-secret (merge/displace @oauth-consumer-secret)}})
-
 (defn- list-config
   []
   ^:demote {:jp.nijohando.chabonze.twitter/list
+            {:rtm (ig/ref :jp.nijohando.chabonze.bot.slack/rtm)
+             :logger (ig/ref :duct/logger)
+             :twauth (ig/ref :jp.nijohando.chabonze.twitter/auth)
+             :socket-timeout (merge/displace 1000)
+             :connect-timeout (merge/displace 1000)}})
+
+(defn- timeline-config
+  []
+  ^:demote {:jp.nijohando.chabonze.twitter/timeline
             {:rtm (ig/ref :jp.nijohando.chabonze.bot.slack/rtm)
              :logger (ig/ref :duct/logger)
              :twauth (ig/ref :jp.nijohando.chabonze.twitter/auth)
@@ -50,7 +58,8 @@
              :store (ig/ref :jp.nijohando.chabonze.bot/store)
              :logger (ig/ref :duct/logger)
              :twlist (ig/ref :jp.nijohando.chabonze.twitter/list)
-             :twsearch (ig/ref :jp.nijohando.chabonze.twitter/search)}})
+             :twsearch (ig/ref :jp.nijohando.chabonze.twitter/search)
+             :twtimeline (ig/ref :jp.nijohando.chabonze.twitter/timeline)}})
 
 (defn- command-config
   [command-name]
@@ -66,6 +75,7 @@
                       (search-config)
                       (watch-config)
                       (list-config)
+                      (timeline-config)
                       (auth-config)
                       (command-config command-name)))
 

@@ -7,7 +7,7 @@
                  [fipp "0.6.14"]
                  [duct/module.logging "0.4.0-alpha1"]
                  [jp.nijohando.chabonze/module.bot "0.1.1"]
-                 ;[jp.nijohando.chabonze/module.twitter "0.1.1"]
+                 ;[jp.nijohando.chabonze/module.twitter "0.1.2"]
                  ]
   :plugins [[duct/lein-duct "0.11.0-beta1"]]
   :main ^:skip-aot chabonze-app.main
