@@ -1,4 +1,4 @@
-(defproject jp.nijohando.chabonze/module.twitter "0.1.1"
+(defproject jp.nijohando.chabonze/module.twitter "0.1.2"
   :description "Duct module for chabonze twitter"
   :url "https://github.com/nijohando/chabonze/module.twitter"
   :dependencies [[org.clojure/clojure "1.9.0"]

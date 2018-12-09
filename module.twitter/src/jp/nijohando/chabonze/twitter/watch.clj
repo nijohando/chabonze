@@ -13,6 +13,7 @@
    [jp.nijohando.chabonze.bot.command :as cmd]
    [jp.nijohando.chabonze.twitter.list :as twitter.list]
    [jp.nijohando.chabonze.twitter.search :as twitter.search]
+   [jp.nijohando.chabonze.twitter.timeline :as twitter.timeline]
    [jp.nijohando.failable :as f]
    [jp.nijohando.deferable :as d]
    [jp.nijohando.event :as ev]
@@ -37,14 +38,18 @@
                      (update ctx :strings conj x)))) {:strings []})))
 
 (defn- service
-  [{:keys [rtm web logger store twlist twsearch] :as opts}]
+  [{:keys [rtm web logger store twlist twsearch twtimeline] :as opts}]
   (let [timer (tm/timer)
         watches (agent {})]
     (letfn [(fetch-tweets [task-id]
-              (if-let [{:keys [list search since-id] :as task} (get-in @store [:twitter :watch :tasks task-id])]
+              (if-let [{:keys [list search timeline since-id] :as task} (get-in @store [:twitter :watch :tasks task-id])]
                 (f/if-succ [x (cond
                                 (some? list) (twitter.list/get-tweets twlist (:id list) since-id)
-                                (some? search) (twitter.search/get-tweets twsearch (:query search) since-id))]
+                                (some? search) (twitter.search/get-tweets twsearch (:query search) since-id)
+                                (some? timeline) (condp = (:type timeline)
+                                                   :home (twitter.timeline/get-home-tweets twtimeline since-id)
+                                                   (-> (f/fail :unknown-timeline-type)
+                                                       (assoc :timeline timeline))))]
                   (when-not (empty? x)
                     (let [latest-id (-> x first :id_str)
                           tweets (reverse x)]
@@ -100,6 +105,8 @@
                               ["-A" "--add-query QUERY" "add query watch task"
                                :id :add-query
                                :parse-fn parse-query]
+                              ["-t" "--add-home-timeline" "add home timeline watch task"
+                               :id :add-home-timeline]
                               ["-i" "--interval MINUTES" "watch interval"
                                :validate [#(>= % 1) "interval must be greater than 0"]
                                :default 10
@@ -115,6 +122,7 @@
                                   "Usage: /twitter watch -l"
                                   "   or: /twitter watch -a <SLUG> -i <INTERVAL>"
                                   "   or: /twitter watch -A <QUERY> -i <INTERVAL>"
+                                  "   or: /twitter watch -t -i <INTERVAL>"
                                   "   or: /twitter watch -d <TASK-ID>"
                                   ""
                                   "Options:"
@@ -133,6 +141,7 @@
                   errors {:exit-message (str (error-msg errors) "\n\n" (usage summary))}
                   (has-option? :add-list) {:action :add-list :options options}
                   (has-option? :add-query) {:action :add-query :options options}
+                  (has-option? :add-home-timeline) {:action :add-home-timeline :options options}
                   (has-option? :list) {:action :list}
                   (has-option? :delete) {:action :delete :options options}
                   :else {:exit-message (usage summary)})))
@@ -170,6 +179,22 @@
                                                         (->> (register-timer task)
                                                              (assoc state task-id))))
                                         (update-in updated [:twitter :watch :tasks task-id] merge task))))))
+            (add-home-timeline-watch-task [{channel-id :channel :as msg} {interval :interval :as cli-opts}]
+              (f/slet [{channel-name :name} (slack.web/channel web channel-id)]
+                (st/transact! store (fn [state]
+                                      (let [updated (update-in state [:twitter :watch :task-id-seq] (fnil inc 0))
+                                            task-id (-> (get-in updated [:twitter :watch :task-id-seq])
+                                                        str)
+                                            task {:task-id task-id
+                                                  :timeline {:type :home}
+                                                  :channel {:id channel-id
+                                                            :name channel-name}
+                                                  :created-at (now)
+                                                  :interval interval}]
+                                        (send watches (fn [state]
+                                                        (->> (register-timer task)
+                                                             (assoc state task-id))))
+                                        (update-in updated [:twitter :watch :tasks task-id] merge task))))))
             (add-list-command [{:keys [channel] :as msg} {slug :add-list :as cli-opts}]
               (slack.rtm/send-typing rtm channel)
               (if (registered-list? channel slug)
@@ -188,15 +213,27 @@
                   (do
                     (dl/log logger :error :failed-to-add-query-watch-task x)
                     (slack.rtm/send-message rtm channel (str "Opps! Failed to add watch task."))))))
+            (add-home-timeline-command [{:keys [channel] :as msg} cli-opts]
+              (slack.rtm/send-typing rtm channel)
+              (f/if-succ [x (add-home-timeline-watch-task msg cli-opts)]
+                (slack.rtm/send-message rtm channel (str "Watching home timeline on this channel."))
+                (do
+                  (dl/log logger :error :failed-to-add-home-timeline-watch-task x)
+                  (slack.rtm/send-message rtm channel (str "Opps! Failed to add watch task.")))))
             (list-command [{:keys [channel] :as msg} cli-opts]
               (slack.rtm/send-typing rtm channel)
               (let [xs (->> (get-in @store [:twitter :watch :tasks])
                             vals
                             (map (fn [x] (merge (select-keys x [:task-id :interval])
                                                 {:channel (get-in x [:channel :name])
-                                                 :type (if (contains? x :list) "list" "query")
+                                                 :type (cond
+                                                         (contains? x :list) "list"
+                                                         (contains? x :query) "query"
+                                                         (contains? x :timeline) "timeline"
+                                                         :else "unknown")
                                                  :target (or (get-in x [:list :slug])
-                                                                (get-in x [:search :query]))}))))]
+                                                             (get-in x [:search :query])
+                                                             (get-in x [:timeline :type]))}))))]
                 (->> (str "```"
                           (util/tabular-text (array-map :task-id "TASK-ID"
                                                         :channel "CHANNEL"
@@ -224,6 +261,7 @@
               (condp = action
                 :add-list (add-list-command msg cli-opts)
                 :add-query (add-query-command msg cli-opts)
+                :add-home-timeline (add-home-timeline-command msg cli-opts)
                 :list (list-command msg cli-opts)
                 :delete (delete-command msg cli-opts)))))
         Service

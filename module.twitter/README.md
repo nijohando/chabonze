@@ -35,7 +35,7 @@ You will get a oauth consumer key and its secret.
 Add module dependency to project.clj in chabonze-app
 
 ```clojure
-[jp.nijohando.chabonze/module.twitter "0.1.0"]
+[jp.nijohando.chabonze/module.twitter "0.1.2"]
 ```
 
 ### 4. Add module configuration
@@ -124,19 +124,16 @@ traffic   private   15        traffic
 Usage: /twitter watch -l
    or: /twitter watch -a <SLUG> -i <INTERVAL>
    or: /twitter watch -A <QUERY> -i <INTERVAL>
-   or: /twitter watch -d <TASK-ID>## License
-
-© 2017-2018 nijohando  
-
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
-
+   or: /twitter watch -t -i <INTERVAL>
+   or: /twitter watch -d <TASK-ID>
 
 Options:
-  -l, --list                  show watch tasks
-  -a, --add-list SLUG         add list watch task
-  -A, --add-query QUERY       add query watch task
-  -i, --interval MINUTES  10  watch interval
-  -d, --delete TASK-ID        delete watch task
+  -l, --list                   show watch tasks
+  -a, --add-list SLUG          add list watch task
+  -A, --add-query QUERY        add query watch task
+  -t, --add-home-timeline      add home timeline watch task
+  -i, --interval MINUTES   10  watch interval
+  -d, --delete TASK-ID         delete watch task
   -h, --help
 ```
 
@@ -149,7 +146,9 @@ Also lang parameter can be specified in a query as follows.
 watch -A "clojure lang:ja"
 ```
 
-`watch -l` show list of watch tasks.
+`watch -t` Creates new watch task to subscribe the home timeline.
+
+`watch -l` Show list of watch tasks.
 
 ```
 TASK-ID   CHANNEL         TYPE    TARGET                               INTERVAL(min)

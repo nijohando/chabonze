@@ -24,6 +24,9 @@
     :jp.nijohando.chabonze.twitter/list
     {:connect-timeout 2000
      :socket-timeout 2000}
+    :jp.nijohando.chabonze.twitter/timeline
+    {:connect-timeout 2000
+     :socket-timeout 2000}
     :jp.nijohando.chabonze.twitter/search
     {:connect-timeout 2000
      :socket-timeout 2000}}})
@@ -40,8 +43,15 @@
           :store (ig/ref :jp.nijohando.chabonze.bot/store)
           :logger (ig/ref :duct/logger)
           :twlist (ig/ref :jp.nijohando.chabonze.twitter/list)
-          :twsearch (ig/ref :jp.nijohando.chabonze.twitter/search)}
+          :twsearch (ig/ref :jp.nijohando.chabonze.twitter/search)
+          :twtimeline (ig/ref :jp.nijohando.chabonze.twitter/timeline)}
          :jp.nijohando.chabonze.twitter/list
+         {:rtm (ig/ref :jp.nijohando.chabonze.bot.slack/rtm)
+          :logger (ig/ref :duct/logger)
+          :twauth (ig/ref :jp.nijohando.chabonze.twitter/auth)
+          :connect-timeout 1000
+          :socket-timeout 1000}
+         :jp.nijohando.chabonze.twitter/timeline
          {:rtm (ig/ref :jp.nijohando.chabonze.bot.slack/rtm)
           :logger (ig/ref :duct/logger)
           :twauth (ig/ref :jp.nijohando.chabonze.twitter/auth)
@@ -76,8 +86,15 @@
            :store (ig/ref :jp.nijohando.chabonze.bot/store)
            :logger (ig/ref :duct/logger)
            :twlist (ig/ref :jp.nijohando.chabonze.twitter/list)
-           :twsearch (ig/ref :jp.nijohando.chabonze.twitter/search)}
+           :twsearch (ig/ref :jp.nijohando.chabonze.twitter/search)
+           :twtimeline (ig/ref :jp.nijohando.chabonze.twitter/timeline)}
           :jp.nijohando.chabonze.twitter/list
+          {:rtm (ig/ref :jp.nijohando.chabonze.bot.slack/rtm)
+           :logger (ig/ref :duct/logger)
+           :twauth (ig/ref :jp.nijohando.chabonze.twitter/auth)
+           :connect-timeout 2000
+           :socket-timeout 2000}
+          :jp.nijohando.chabonze.twitter/timeline
           {:rtm (ig/ref :jp.nijohando.chabonze.bot.slack/rtm)
            :logger (ig/ref :duct/logger)
            :twauth (ig/ref :jp.nijohando.chabonze.twitter/auth)
